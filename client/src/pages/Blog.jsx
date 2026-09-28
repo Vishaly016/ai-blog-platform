@@ -20,6 +20,7 @@ const Blog = () => {
   const [comments, setComments] = useState([])
   const [name, setName] = useState('')
   const [content, setContent] = useState('')
+  const [isBookmarked, setIsBookmarked] = useState(false)
 
   const toggleLike = async () => {
     if (!user) {
@@ -53,6 +54,70 @@ const Blog = () => {
 
     } catch (error) {
       toast.error(error.response?.data?.message || error.message)
+    }
+  }
+
+  const toggleBookmark = async () => {
+    if (!user) {
+      toast.error('Please login to bookmark this blog')
+      return
+    }
+
+    try {
+      const { data } = await axios.post(
+        `/api/user/bookmark/${id}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
+        }
+      )
+
+      if (data.success) {
+        setIsBookmarked(data.bookmarked)
+        toast.success(
+          data.bookmarked
+            ? 'Blog bookmarked'
+            : 'Bookmark removed'
+        )
+      } else {
+        toast.error(data.message)
+      }
+
+    } catch (error) {
+      toast.error(error.response?.data?.message || error.message)
+    }
+  }
+
+  const fetchBookmarkStatus = async () => {
+    if (!user || !userToken) {
+      return
+    }
+
+    try {
+      const { data } = await axios.get(
+        '/api/user/bookmarks',
+        {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
+        }
+      )
+
+      if (data.success) {
+        const bookmarked = data.bookmarks.some(
+          bookmark => String(bookmark) === String(id)
+        )
+
+        setIsBookmarked(bookmarked)
+      }
+
+    } catch (error) {
+      console.error(
+        'Fetch Bookmark Status Error:',
+        error
+      )
     }
   }
 
@@ -97,7 +162,15 @@ const Blog = () => {
   useEffect(() => {
     fetchBlogData()
     fetchComments()
-  }, [])
+  }, [id])
+
+  useEffect(() => {
+    fetchBookmarkStatus()
+  }, [id, userToken])
+
+  useEffect(() => {
+    fetchBookmarkStatus()
+  }, [id, userToken])
 
   return data ? (
     <div className='relative'>
@@ -127,6 +200,20 @@ const Blog = () => {
               {data.likes?.length || 0}
             </span>
           </button>
+
+          <button
+            onClick={toggleBookmark}
+            className='flex items-center gap-2 border rounded-full px-5 py-2 hover:scale-105 transition-all cursor-pointer'
+          >
+            <span className='text-xl'>
+              {isBookmarked ? '🔖' : '♧'}
+            </span>
+
+            <span>
+              {isBookmarked ? 'Saved' : 'Save'}
+            </span>
+          </button>
+
         </div>
       </div>
 

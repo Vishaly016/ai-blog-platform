@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
+import Blog from "../models/Blog.js";
 
 
 // Register a new user
@@ -138,5 +139,76 @@ const loginUser = async (req, res) => {
     }
 };
 
+const toggleBookmark = async (req, res) => {
+    try {
+        const { blogId } = req.params;
+        const user = await User.findById(req.userId);
 
-export { registerUser, loginUser };
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found",
+            });
+        }
+
+        const alreadyBookmarked = user.bookmarks.some(
+            (id) => id.toString() === blogId.toString()
+        );
+
+        if (alreadyBookmarked) {
+            user.bookmarks.pull(blogId);
+        } else {
+            user.bookmarks.addToSet(blogId);
+        }
+
+        await user.save();
+
+        return res.status(200).json({
+            success: true,
+            bookmarked: !alreadyBookmarked,
+        });
+
+    } catch (error) {
+        console.error("Toggle Bookmark Error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: error.message,
+        });
+    }
+};
+
+const getBookmarks = async (req, res) => {
+    try {
+        const user = await User.findById(req.userId);
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found",
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            bookmarks: (user.bookmarks || []).map(
+                bookmark => bookmark.toString()
+            ), 
+        });
+
+    } catch (error) {
+        console.error("Get Bookmarks Error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: error.message,
+        });
+    }
+};
+
+export {
+    registerUser,
+    loginUser,
+    toggleBookmark,
+    getBookmarks,
+};
