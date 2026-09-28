@@ -38,3 +38,41 @@
 .rich-text li { margin-bottom: 8px; }
 
 .rich-text a { color: #007AFF }
+
+/* Page transition animations */
+
+.page-transition {
+    width: 100%;
+}
+
+.page-transition.enter {
+    animation: pageEnter 0.35s ease-out;
+}
+
+.page-transition.exit {
+    animation: pageExit 0.18s ease-in;
+}
+
+@keyframes pageEnter {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pageExit {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+}
