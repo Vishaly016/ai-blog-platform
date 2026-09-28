@@ -93,15 +93,39 @@ export const togglePublish = async (req, res) => {
     }
 }
 
-
 export const addComment = async (req, res) => {
+
     try {
-        const { blog, name, content } = req.body;
-        await Comment.create({ blog, name, content });
-        res.json({ success: true, message: 'Comment added for review' })
+
+        const { blog, content } = req.body;
+
+        if (!blog || !content || !content.trim()) {
+            return res.status(400).json({
+                success: false,
+                message: "Comment content is required"
+            });
+        }
+
+        await Comment.create({
+            blog,
+            name: req.userName,
+            content: content.trim()
+        });
+
+        res.json({
+            success: true,
+            message: "Comment added for review"
+        });
+
     } catch (error) {
-        res.json({ success: false, message: error.message })
+
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+
     }
+
 }
 
 export const getBlogComments = async (req, res) => {

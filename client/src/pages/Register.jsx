@@ -115,8 +115,8 @@ const Register = () => {
                     {message && (
                         <p
                             className={`text-center text-sm mt-4 ${message.includes("successful")
-                                    ? "text-green-600"
-                                    : "text-red-500"
+                                ? "text-green-600"
+                                : "text-red-500"
                                 }`}
                         >
                             {message}
@@ -131,6 +131,16 @@ const Register = () => {
                             className="text-primary cursor-pointer"
                         >
                             Login
+                        </button>
+
+                        {" / "}
+
+                        <button
+                            type="button"
+                            onClick={() => navigate("/admin")}
+                            className="text-primary cursor-pointer"
+                        >
+                            Admin Login
                         </button>
                     </p>
 

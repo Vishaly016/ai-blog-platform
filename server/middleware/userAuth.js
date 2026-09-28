@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
+import User from "../models/User.js";
 
-const userAuth = (req, res, next) => {
+const userAuth = async (req, res, next) => {
     try {
         // 1. Get the Authorization header
         const authHeader = req.headers.authorization;
@@ -30,12 +31,21 @@ const userAuth = (req, res, next) => {
             process.env.JWT_SECRET
         );
 
-        // 6. Store the user's ID in the request
         req.userId = decoded.id;
 
-        // 7. Continue to the next middleware/controller
+        const user = await User.findById(decoded.id);
+
+        if (!user) {
+            return res.status(401).json({
+                success: false,
+                message: "User not found",
+            });
+        }
+
+        req.userName = user.name;
+
         next();
- 
+
     } catch (error) {
         console.error("User Authentication Error:", error);
 

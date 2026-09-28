@@ -102,6 +102,16 @@ const Login = () => {
                         >
                             Register
                         </button>
+
+                        {" / "}
+
+                        <button
+                            type="button"
+                            onClick={() => navigate("/admin")}
+                            className="text-primary cursor-pointer"
+                        >
+                            Admin Login
+                        </button>
                     </p>
 
                 </form>

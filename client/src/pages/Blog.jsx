@@ -18,7 +18,6 @@ const Blog = () => {
 
   const [data, setData] = useState(null)
   const [comments, setComments] = useState([])
-  const [name, setName] = useState('')
   const [content, setContent] = useState('')
   const [isBookmarked, setIsBookmarked] = useState(false)
 
@@ -122,6 +121,8 @@ const Blog = () => {
   }
 
   const fetchBlogData = async () => {
+
+    if (!id) return
     try {
       const { data } = await axios.get(`/api/blog/${id}`)
       data.success ? setData(data.blog) : toast.error(data.message)
@@ -144,18 +145,43 @@ const Blog = () => {
   }
 
   const addComment = async (e) => {
-    e.preventDefault();
+
+    e.preventDefault()
+
+    if (!user) {
+      toast.error('Please login to comment')
+      return
+    }
+
     try {
-      const { data } = await axios.post('/api/blog/add-comment', { blog: id, name, content });
+
+      const { data } = await axios.post(
+        '/api/blog/add-comment',
+        {
+          blog: id,
+          content
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
+        }
+      )
+
       if (data.success) {
         toast.success(data.message)
-        setName('')
         setContent('')
       } else {
-        toast.error(data.message);
+        toast.error(data.message)
       }
+
     } catch (error) {
-      toast.error(error.message);
+
+      toast.error(
+        error.response?.data?.message ||
+        'Failed to add comment'
+      )
+
     }
   }
 
@@ -163,10 +189,6 @@ const Blog = () => {
     fetchBlogData()
     fetchComments()
   }, [id])
-
-  useEffect(() => {
-    fetchBookmarkStatus()
-  }, [id, userToken])
 
   useEffect(() => {
     fetchBookmarkStatus()
@@ -242,9 +264,17 @@ const Blog = () => {
         {/* Add Comment Section */}
         <div className='max-w-3xl mx-auto'>
           <p className='font-semibold mb-4'>Add your comment</p>
-          <form onSubmit={addComment} className='flex flex-col items-start gap-4 max-w-lg'>
 
-            <input onChange={(e) => setName(e.target.value)} value={name} type="text" placeholder='Name' required className='w-full p-2 border border-gray-300 rounded outline-none' />
+          {user && (
+            <p className='text-sm text-gray-500 mb-3'>
+              Commenting as{' '}
+              <span className='font-medium text-gray-700'>
+                {user.name}
+              </span>
+            </p>
+          )}
+
+          <form onSubmit={addComment} className='flex flex-col items-start gap-4 max-w-lg'>
 
             <textarea onChange={(e) => setContent(e.target.value)} value={content} placeholder='Comment' className='w-full p-2 border border-gray-300 rounded outline-none h-48' required></textarea>
 

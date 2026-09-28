@@ -7,10 +7,6 @@ const PageTransition = ({ children, transitionKey }) => {
 
     useEffect(() => {
 
-        if (transitionKey === undefined) {
-            return;
-        }
-
         setIsExiting(true);
 
         const timer = setTimeout(() => {
@@ -20,7 +16,7 @@ const PageTransition = ({ children, transitionKey }) => {
 
         return () => clearTimeout(timer);
 
-    }, [transitionKey, children]);
+    }, [transitionKey]);
 
     return (
         <div className={isExiting ? "page-transition exit" : "page-transition enter"}>
