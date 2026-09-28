@@ -113,7 +113,12 @@ const Register = () => {
                     </button>
 
                     {message && (
-                        <p className="text-center text-sm mt-4">
+                        <p
+                            className={`text-center text-sm mt-4 ${message.includes("successful")
+                                    ? "text-green-600"
+                                    : "text-red-500"
+                                }`}
+                        >
                             {message}
                         </p>
                     )}

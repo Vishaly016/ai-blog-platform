@@ -8,7 +8,6 @@ const registerUser = async (req, res) => {
     try {
         const { name, email, password } = req.body;
 
-        // 1. Check whether all required fields are provided
         if (!name || !email || !password) {
             return res.status(400).json({
                 success: false,
@@ -16,8 +15,28 @@ const registerUser = async (req, res) => {
             });
         }
 
-        // 2. Check whether a user with this email already exists
-        const existingUser = await User.findOne({ email });
+        const normalizedName = name.trim();
+        const normalizedEmail = email.trim().toLowerCase();
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (!emailRegex.test(normalizedEmail)) {
+            return res.status(400).json({
+                success: false,
+                message: "Please enter a valid email address",
+            });
+        }
+
+        if (password.length < 6) {
+            return res.status(400).json({
+                success: false,
+                message: "Password must be at least 6 characters long",
+            });
+        }
+
+        const existingUser = await User.findOne({
+            email: normalizedEmail,
+        });
 
         if (existingUser) {
             return res.status(409).json({
@@ -26,17 +45,14 @@ const registerUser = async (req, res) => {
             });
         }
 
-        // 3. Hash the password before storing it
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // 4. Create the new user
         const user = await User.create({
-            name,
-            email,
+            name: normalizedName,
+            email: normalizedEmail,
             password: hashedPassword,
         });
 
-        // 5. Send success response
         return res.status(201).json({
             success: true,
             message: "User registered successfully",
