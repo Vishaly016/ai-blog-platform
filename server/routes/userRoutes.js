@@ -8,4 +8,5 @@ userRouter.post("/register", registerUser);
 // Login an existing user
 userRouter.post("/login", loginUser); 
 
+
 export default userRouter;
