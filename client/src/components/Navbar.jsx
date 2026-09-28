@@ -21,7 +21,7 @@ const Navbar = () => {
             <span className='text-sm text-gray-600'>
                 Hi, {user?.name}
             </span>
- 
+
             <button
                 onClick={logout}
                 className='text-sm cursor-pointer border border-gray-300 rounded-full px-5 py-2'
@@ -47,15 +47,18 @@ const Navbar = () => {
         </>
     )}
 
-    <button
-        onClick={() => navigate('/admin')}
-        className='flex items-center gap-2 rounded-full text-sm cursor-pointer bg-primary text-white px-6 py-2.5'
-    >
-        {token ? 'Dashboard' : 'Admin'}
-        <img src={assets.arrow} className='w-3' alt="arrow" />
-    </button>
+    {token && (
+        <button
+            onClick={() => navigate('/admin')}
+            className='flex items-center gap-2 rounded-full text-sm cursor-pointer bg-primary text-white px-6 py-2.5'
+        >
+            Admin Panel
+            <img src={assets.arrow} className='w-3' alt="arrow" />
+        </button>
+    )}
 
 </div>
+      
     </div>
   )
 }
